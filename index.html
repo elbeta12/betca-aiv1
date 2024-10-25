@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetaCañ-AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #001133, #003366);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            z-index: 1;
+        }
+
+        #chat {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 350px;
+            height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #input {
+            width: calc(100% - 100px);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            outline: none;
+            background: #333;
+            color: #ffffff;
+            z-index: 1;
+            transition: background 0.3s;
+        }
+
+        #input:focus {
+            background: #444;
+        }
+
+        #sendButton {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 1;
+        }
+
+        #sendButton:hover {
+            background: #0056b3;
+        }
+
+        p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        ul {
+            margin: 5px 0 10px 20px;
+            padding: 0;
+            list-style-type: disc;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 1.5s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .sun {
+            position: absolute;
+            background: yellow;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: moveSun 10s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.7);
+        }
+
+        @keyframes moveSun {
+            0% { top: 10%; }
+            50% { top: 50%; }
+            100% { top: 10%; }
+        }
+
+        .landscape {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to top, #006600, transparent);
+            z-index: 0;
+        }
+
+        .message {
+            margin: 5px 0;
+        }
+
+        .game-container {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .trivia-question {
+            margin: 10px 0;
+        }
+
+        .trivia-answer {
+            display: block;
+            margin: 5px 0;
+            background: #007BFF;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .trivia-answer:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="stars">
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = `${Math.random() * 3 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            document.querySelector('.stars').appendChild(star);
+        }
+    </script>
+</div>
+
+<div class="sun"></div>
+<div class="landscape"></div>
+
+<h1>BetaCañ-AI</h1>
+<div id="chat"></div>
+<div style="display: flex; margin-top: 10px; width: 350px;">
+    <input type="text" id="input" placeholder="Escribe un mensaje..." />
+    <button id="sendButton">Enviar</button>
+</div>
+
+<div id="gameContainer" class="game-container"></div>
+
+<script>
+    const tasks = [
+        'ARTISTIC',
+        'lectoescritura',
+        'PARA MÁS INFORMACIÓN CONSULTA EN EL WHATSAPP DE BETA.AI.',
+        'Preparar presentación para la reunión.',
+        'Completar la tarea de matemáticas.',
+        'Leer capítulo 5 del libro de historia.'
+    ];
+
+    const greetings = [
+        '¡Hola! ¿En qué puedo ayudarte hoy?',
+        '¡Hola! Estoy aquí para ayudarte.',
+        '¡Hola! ¿Cómo puedo asistirte hoy?',
+        '¡Hola! ¿Qué tal tu día hasta ahora?',
+        '¡Hola! Estoy aquí para cualquier consulta.'
+    ];
+
+    const farewells = [
+        '¡Hasta luego! Si necesitas más ayuda, aquí estaré.',
+        '¡Cuídate! Espero verte pronto.',
+        '¡Adiós! No dudes en volver si necesitas algo.',
+        '¡Adiós! Recuerda que siempre puedes contar conmigo.',
+        '¡Hasta la próxima! Cuídate mucho.'
+    ];
+
+    const advice = [
+        'Siempre busca aprender algo nuevo cada día.',
+        'No te compares con los demás; cada uno tiene su propio camino.',
+        'Recuerda descansar y cuidar de ti mismo.',
+        'Establece metas pequeñas y celebra tus logros.',
+        'La perseverancia es clave para alcanzar tus objetivos.'
+    ];
+
+    const funFacts = [
+        '¿Sabías que el océano cubre más del 70% de la superficie de la Tierra?',
+        'Los pulpos tienen tres corazones y sangre azul.',
+        'Las abejas pueden reconocer rostros humanos.',
+        'El sol es tan grande que caben dentro de él 1.3 millones de planetas Tierra.',
+        'El corazón de un camarón está en su cabeza.'
+    ];
+
+    const motivationalQuotes = [
+        'La vida es 10% lo que me ocurre y 90% cómo reacciono a ello. - Charles R. Swindoll',
+        'El éxito es la suma de pequeños esfuerzos repetidos día tras día. - Robert Collier',
+        'El único modo de hacer un gran trabajo es amar lo que haces. - Steve Jobs',
+        'La mejor manera de predecir el futuro es crearlo. - Peter Drucker'
+    ];
+
+    const triviaQuestions = [
+        { question: "¿Cuál es el país más grande del mundo?", answers: ["Rusia", "Canadá", "China", "EE.UU."], correct: 0 },
+        { question: "¿Qué planeta es conocido como el planeta rojo?", answers: ["Tierra", "Marte", "Júpiter", "Saturno"], correct: 1 },
+        { question: "¿Cuál es la capital de España?", answers: ["Barcelona", "Madrid", "Valencia", "Sevilla"], correct: 1 },
+    ];
+
+    let currentTrivia = null;
+
+    function addMessage(sender, message) {
+        const chat = document.getElementById('chat');
+        chat.innerHTML += `<p class="message"><strong>${sender}:</strong> ${message}</p>`;
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function startTrivia() {
+        currentTrivia = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)];
+        const gameContainer = document.getElementById('gameContainer');
+        gameContainer.innerHTML = `
+            <h3>Trivia</h3>
+            <p class="trivia-question">${currentTrivia.question}</p>
+            ${currentTrivia.answers.map((answer, index) => `
+                <button class="trivia-answer" onclick="checkAnswer(${index})">${answer}</button>
+            `).join('')}
+        `;
+        gameContainer.style.display = 'block';
+    }
+
+    function checkAnswer(selected) {
+        if (selected === currentTrivia.correct) {
+            addMessage('Chatbot', '¡Correcto! 🎉');
+        } else {
+            addMessage('Chatbot', 'Incorrecto. 😞 La respuesta correcta era: ' + currentTrivia.answers[currentTrivia.correct]);
+        }
+        document.getElementById('gameContainer').style.display = 'none';
+    }
+
+    function startGuessingGame() {
+        const secretNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        const gameContainer = document.getElementById('gameContainer');
+        gameContainer.innerHTML = `
+            <h3>Adivina el número (1-100)</h3>
+            <input type="number" id="guessInput" placeholder="Introduce un número" />
+            <button onclick="checkGuess(${secretNumber})">Adivinar</button>
+            <p id="guessResult"></p>
+        `;
+        gameContainer.style.display = 'block';
+    }
+
+    function checkGuess(secretNumber) {
+        const userGuess = parseInt(document.getElementById('guessInput').value);
+        const resultMessage = document.getElementById('guessResult');
+
+        if (userGuess === secretNumber) {
+            resultMessage.textContent = '¡Correcto! 🎉';
+        } else if (userGuess < secretNumber) {
+            resultMessage.textContent = 'Demasiado bajo. Intenta de nuevo.';
+        } else {
+            resultMessage.textContent = 'Demasiado alto. Intenta de nuevo.';
+        }
+    }
+
+    function processInput(userText) {
+        const lowerText = userText.toLowerCase();
+
+        if (lowerText === 'hola') {
+            addMessage('Chatbot', greetings[Math.floor(Math.random() * greetings.length)]);
+        } else if (userText === '/tareas') {
+            const taskList = tasks.map(task => `<li>${task}</li>`).join('');
+            addMessage('Chatbot', 'Aquí tienes tu lista de tareas:');
+            addMessage('Chatbot', `<ul>${taskList}</ul>`);
+        } else if (lowerText === 'qué eres') {
+            addMessage('Chatbot', 'Soy una IA en desarrollo que está aquí para ayudarte.');
+        } else if (lowerText === 'cómo estás') {
+            addMessage('Chatbot', '¡Estoy aquí para ayudarte! ¿Y tú?');
+        } else if (lowerText === 'cuéntame un chiste') {
+            addMessage('Chatbot', '¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.');
+        } else if (lowerText === 'dame una cita') {
+            addMessage('Chatbot', motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
+        } else if (lowerText === 'soporte') {
+            addMessage('Chatbot', 'Si necesitas soporte, puedes unirte a nuestro grupo de WhatsApp: <a href="https://chat.whatsapp.com/EKPVpoGhVlHJKpZua9sTtT" style="color: #007BFF;">Grupo de Soporte</a>');
+        } else if (lowerText === 'adiós') {
+            addMessage('Chatbot', farewells[Math.floor(Math.random() * farewells.length)]);
+        } else if (lowerText === 'dame un consejo') {
+            addMessage('Chatbot', advice[Math.floor(Math.random() * advice.length)]);
+        } else if (lowerText === 'dame un dato curioso') {
+            addMessage('Chatbot', funFacts[Math.floor(Math.random() * funFacts.length)]);
+        } else if (lowerText === 'trivia') {
+            startTrivia();
+        } else if (lowerText === 'juego de adivinanza') {
+            startGuessingGame();
+        } else {
+            addMessage('Chatbot', 'Lo siento, no entendí eso. Intenta preguntar otra cosa o escribe "ayuda" para ver las opciones.');
+        }
+    }
+
+    document.getElementById('sendButton').addEventListener('click', () => {
+        const input = document.getElementById('input');
+        const userText = input.value.trim();
+        if (userText) {
+            addMessage('Usuario', userText);
+            processInput(userText);
+            input.value = '';
+        }
+    });
+
+    document.getElementById('input').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            document.getElementById('sendButton').click();
+        }
+    });
+</script>
+</body>
+</html>
+
